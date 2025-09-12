@@ -8,9 +8,13 @@ import model.BookModel;
 import model.ErrorModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import services.BooksService;
 import io.qameta.allure.*;
+import testData.BookTestData;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -39,6 +43,7 @@ public class BookTests {
     public BookTests() throws JsonProcessingException {
     }
 
+    @DisplayName("Get all books")
     @Story("Get all books")
     @Test
     void getBooks() throws IOException, InterruptedException {
@@ -57,40 +62,32 @@ public class BookTests {
         assertEquals(200, totalBooks, "Total number of books should be " + totalBooks);
     }
 
+    @DisplayName("Get specific book by ID")
     @Story("Get specific book")
-    @Test
-    void getSpecificBooksByID() throws IOException, InterruptedException {
-        int bookToGet = 123;
-        Response<BookModel> response = books.getAllByID(bookToGet);
-        assertEquals(200, response.getStatusCode());
+    @ParameterizedTest
+    @Step("Testing get book with ID: {testData.id}")
+    @MethodSource("testData.BookTestData#positiveGetData")
+    void getSpecificBookByID(BookTestData.GetBookPositiveNegativeCase testData) throws IOException, InterruptedException {
+        Response<BookModel> response = books.getByID(testData.id);
+        assertEquals(testData.expectedStatus, response.getStatusCode());
 
         BookModel books = response.getBody();
-        assertEquals(bookToGet, books.id);
-        assertEquals("Book 123", books.title);
+        assertEquals(testData.id, books.id);
+        assertEquals(testData.expectedTitle, books.title);
     }
 
-    @Story("Try to get Book by OutOfRangeID")
-    @Test
-    void getBooksByOutOfRangeID() throws IOException, InterruptedException {
-        int nonExistingId = 9999;
-        Response<ErrorModel> responseError = books.getErrorByID(nonExistingId);
-        assertEquals(404, responseError.getStatusCode());
+    @DisplayName("Try to get Book by providing negative data")
+    @Story("Try to get Book with negative data")
+    @ParameterizedTest
+    @Step("Testing negative case with book ID: {testData.id}")
+    @MethodSource("testData.BookTestData#negativeGetData")
+    void getBooksByNegativeData(BookTestData.GetBookPositiveNegativeCase testData) throws IOException, InterruptedException {
+        Response<ErrorModel> responseError = books.getErrorByID(testData.id);
+        assertEquals(testData.expectedStatus, responseError.getStatusCode());
 
         ErrorModel error = responseError.getBody();
 
-        assertEquals("Not Found", error.title);
-    }
-
-    @Story("Try to get Book by long ID")
-    @Test
-    void getBooksByLongID() throws IOException, InterruptedException {
-        int nonExistingId = 2147483647;
-        Response<ErrorModel> responseError = books.getErrorByID(nonExistingId);
-        assertEquals(404, responseError.getStatusCode());
-
-        ErrorModel error = responseError.getBody();
-
-        assertEquals("Not Found", error.title);
+        assertEquals(testData.expectedTitle, error.title);
     }
 
     @Story("Try to get Book by negative ID")
@@ -105,140 +102,49 @@ public class BookTests {
         assertEquals("Not Found", error.title);
     }
 
-    @Story("Try to get Book by other negative ID")
-    @Test
-    void getBooksByOtherNegativeID() throws IOException, InterruptedException {
-        int nonExistingId = -50;
-        Response<ErrorModel> responseError = books.getErrorByID(nonExistingId);
-        assertEquals(404, responseError.getStatusCode());
-
-        ErrorModel error = responseError.getBody();
-
-        assertEquals("Not Found", error.title);
-    }
-
-    @Story("Try to get Book with 0 for ID")
-    @Test
-    void getBooksBy0ID() throws IOException, InterruptedException {
-        int nonExistingId = 0;
-        Response<ErrorModel> responseError = books.getErrorByID(nonExistingId);
-        assertEquals(404, responseError.getStatusCode());
-
-        ErrorModel error = responseError.getBody();
-
-        assertEquals("Not Found", error.title);
-    }
-
+    @DisplayName("Create Book with valid data")
     @Story("Create book")
-    @Test
-    void postBook() throws IOException, InterruptedException {
-        BookModel createdBook = buildBook(123, "My TEST Book", "How to create automation framework.",
-                222, "Sample excerpt...", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-
-        Response<BookModel> response = books.create(createdBook);
+    @ParameterizedTest
+    @Step("Testing book creation with book ID: {book.id}")
+    @MethodSource("testData.BookTestData#positivePostData")
+    void postBook(BookModel book) throws IOException, InterruptedException {
+        Response<BookModel> response = books.create(book);
         assertEquals(200, response.getStatusCode());
 
-        BookModel expected = createdBook;
+        BookModel expected = book;
         BookModel actual = response.getBody();
 
         assertEquals(expected.id, actual.id);
         assertEquals(expected.title, actual.title);
     }
 
+    @DisplayName("Try to create Book with invalid data")
     @Story("Try to create book with invalid data")
-    @Test
-    void postBookInvalidData() throws IOException, InterruptedException {
-        BookModel createdBook = buildBook(2147483647, "My Invalid Book", "How to create invalid book",
-                550, "Invalid", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-
-        Response<BookModel> response = books.create(createdBook);
+    @ParameterizedTest
+    @Step("Testing book creation with invalid ID: {book.id}")
+    @MethodSource("testData.BookTestData#negativePostData")
+    void postBookInvalidData(BookModel book) throws IOException, InterruptedException {
+        Response<BookModel> response = books.create(book);
         assertEquals(200, response.getStatusCode());
 
-        BookModel expected = createdBook;
+        BookModel expected = book;
         BookModel actual = response.getBody();
 
         assertEquals(expected.id, actual.id);
         assertEquals(expected.title, actual.title);
     }
 
-    @Story("Try to create book with long title")
-    @Test
-    void postBookLongTitle() throws IOException, InterruptedException {
-        BookModel createdBook = buildBook(100, "My Book Long Title My Book Long Title My Book Long Title My Book Long Title My Book Long Title My Book Long Title My Book Long Title My Book Long Title",
-                "Book with long title",
-                530, "Title", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+    @DisplayName("Update book and check response")
+    @Story("Update book")
+    @ParameterizedTest
+    @Step("Testing book update and check response with book ID: {book.id}")
+    @MethodSource("testData.BookTestData#positivePutData")
+    void updateBook(BookModel book) throws IOException, InterruptedException {
 
-        Response<BookModel> response = books.create(createdBook);
+        Response<BookModel> response = books.update(book, book.id);
         assertEquals(200, response.getStatusCode());
 
-        BookModel expected = createdBook;
-        BookModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.title, actual.title);
-    }
-
-    @Story("Try to create book with empty title")
-    @Test
-    void postBookEmptyTitle() throws IOException, InterruptedException {
-        BookModel createdBook = buildBook(133, "",
-                "Book with empty title",
-                510, "Title", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-
-        Response<BookModel> response = books.create(createdBook);
-        assertEquals(200, response.getStatusCode());
-
-        BookModel expected = createdBook;
-        BookModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.title, actual.title);
-    }
-
-    @Story("Try to create book with empty description")
-    @Test
-    void postBookEmptyDescription() throws IOException, InterruptedException {
-        BookModel createdBook = buildBook(138, "MyBookTitle",
-                "",
-                514, "MyBookTitle", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-
-        Response<BookModel> response = books.create(createdBook);
-        assertEquals(200, response.getStatusCode());
-
-        BookModel expected = createdBook;
-        BookModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.title, actual.title);
-    }
-
-    @Story("Try to create book with null data")
-    @Test
-    void postBookNullData() throws IOException, InterruptedException {
-        BookModel createdBook = buildBook(190, null,
-                null,
-                190, "MyBookTitle", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-
-        Response<BookModel> response = books.create(createdBook);
-        assertEquals(200, response.getStatusCode());
-
-        BookModel expected = createdBook;
-        BookModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.title, actual.title);
-    }
-
-    @Story("Update author")
-    @Test
-    void updateBook() throws IOException, InterruptedException {
-        BookModel updatedBook = buildBook(140, "My Updated TEST Book", "How to update", 220, "Sample Update",
-                ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-
-        Response<BookModel> response = books.update(updatedBook);
-        assertEquals(200, response.getStatusCode());
-
-        BookModel expected = updatedBook;
+        BookModel expected = book;
         BookModel actual = response.getBody();
 
         assertEquals(expected.id, actual.id);
@@ -246,47 +152,51 @@ public class BookTests {
         assertEquals(expected.description, actual.description);
     }
 
-    @Story("Get author and update author")
-    @Test
-    void getUpdateBook() throws IOException, InterruptedException {
-        int bookToGet = 50;
-        Response<BookModel> response = books.getAllByID(bookToGet);
+    @DisplayName("Get book, update and check update is made")
+    @Story("Get book and update")
+    @ParameterizedTest
+    @Step("Testing get book, update and check update is made for book ID: {book.id}")
+    @MethodSource("testData.BookTestData#positivePutData")
+    void getUpdateBook(BookModel book) throws IOException, InterruptedException {
+        Response<BookModel> response = books.getByID(book.id);
         assertEquals(200, response.getStatusCode());
 
         BookModel bookToCompare = response.getBody();
 
-        BookModel updatedBook = buildBook(300, "Get Update TEST Book", "Get Update", 258, "Sample Get Update",
-                ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-
-        Response<BookModel> responseUpdated = books.update(updatedBook);
+        Response<BookModel> responseUpdated = books.update(book, book.id);
         assertEquals(200, responseUpdated.getStatusCode());
 
         BookModel bookUpdated = responseUpdated.getBody();
 
-        assertEquals(bookToCompare.id, bookUpdated.id);
-        assertEquals(bookToCompare.title, bookUpdated.title);
-        assertEquals(bookToCompare.description, bookUpdated.description);
+        assertEquals(bookUpdated.id, bookToCompare.id);
+        assertEquals(bookUpdated.title, bookToCompare.title);
+        assertEquals(bookUpdated.description, bookToCompare.description);
     }
 
 
-    @Story("Delete author")
-    @Test
-    void deleteBook() throws IOException, InterruptedException {
-        int idToDelete = 100;
-        Response<BookModel> response = books.delete(idToDelete);
+    @DisplayName("Delete book with valid data")
+    @Story("Delete book")
+    @ParameterizedTest
+    @Step("Testing delete book with ID: {testData.id}")
+    @MethodSource("testData.BookTestData#positiveDeleteData")
+    void deleteBook(BookTestData.GetBookPositiveNegativeCase testData) throws IOException, InterruptedException {
+        Response<BookModel> response = books.delete(testData.id);
         assertEquals(200, response.getStatusCode());
-        Response<BookModel> responseGet = books.getAllByID(idToDelete);
-        assertEquals(404, responseGet.getStatusCode());
+        Response<BookModel> responseGet = books.getByID(testData.id);
+        assertEquals(testData.expectedStatus, responseGet.getStatusCode());
     }
 
+    @DisplayName("Try to delete book by providing invalid data")
     @Story("Try to delete book by providing invalid ID")
-    @Test
-    void invalidDelete() throws IOException, InterruptedException {
-        int idToDelete = -100;
-        Response<BookModel> response = books.delete(idToDelete);
-        assertEquals(404, response.getStatusCode());
+    @ParameterizedTest
+    @Step("Testing delete book with invalid ID: {testData.id}")
+    @MethodSource("testData.BookTestData#negativeDeleteData")
+    void invalidDelete(BookTestData.GetBookPositiveNegativeCase testData) throws IOException, InterruptedException {
+        Response<BookModel> response = books.delete(testData.id);
+        assertEquals(testData.expectedStatus, response.getStatusCode());
     }
 
+    @DisplayName("Try to create book with invalid ID")
     @Story("Try to create book with invalid ID")
     @Test
     void createInvalidPOSTBook() throws IOException, InterruptedException {

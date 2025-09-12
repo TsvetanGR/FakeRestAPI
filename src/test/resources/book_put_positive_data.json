@@ -1,0 +1,23 @@
+[
+  {
+    "id": 50,
+    "title": "Book 50 Updated",
+    "description": "Book 50 Updated descr",
+    "pageCount": 500,
+    "excerpt": "Book 50 Updated excerpt"
+  },
+  {
+    "id": 140,
+    "title": "Book 140 Updated",
+    "description": "empty",
+    "pageCount": 13999,
+    "excerpt": "empty"
+  },
+  {
+    "id": 120,
+    "title": "Book 120 Updated",
+    "description": null,
+    "pageCount": 150,
+    "excerpt": null
+  }
+]

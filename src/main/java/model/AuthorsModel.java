@@ -18,4 +18,13 @@ public class AuthorsModel {
             this.lastName = lastName;
         }
 
+    @Override
+    public String toString() {
+        return "Author{id=" + id +
+                ", idBook=" + idBook +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
+
 }

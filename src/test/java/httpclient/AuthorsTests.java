@@ -8,13 +8,17 @@ import model.AuthorsModel;
 import model.ErrorModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import services.AuthorsService;
 
 import java.io.IOException;
 import java.util.List;
 
 import io.qameta.allure.*;
+import testData.AuthorTestData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,6 +42,7 @@ public class AuthorsTests {
     public AuthorsTests() throws JsonProcessingException {
     }
 
+    @DisplayName("Get all authors")
     @Story("Get all authors")
     @Test
     void getAuthors() throws IOException, InterruptedException {
@@ -58,44 +63,37 @@ public class AuthorsTests {
         assertEquals(lastId, totalAuthors, "Total number of authors should be " + totalAuthors);
     }
 
+    @DisplayName("Get specific author by ID")
     @Story("Get specific author")
-    @Test
-    void getAuthorsById() throws IOException, InterruptedException {
-        int idToGet = 150;
-        Response<AuthorsModel> response = authors.getAllByID(idToGet);
-        assertEquals(200, response.getStatusCode());
+    @ParameterizedTest
+    @Step("Testing get author by ID: {testData.id}")
+    @MethodSource("testData.AuthorTestData#positiveGetData")
+    void getAuthorById(AuthorTestData.GetAuthorPositiveNegativeCase testData) throws IOException, InterruptedException {
+        Response<AuthorsModel> response = authors.getByID(testData.id);
+        assertEquals(testData.expectedStatus, response.getStatusCode());
 
         AuthorsModel authors = response.getBody();
 
-        assertEquals(150, authors.id);
-        assertEquals("First Name 150", authors.firstName);
-        assertEquals("Last Name 150", authors.lastName);
+        assertEquals(testData.id, authors.id);
+        assertEquals(testData.firstName, authors.firstName);
+        assertEquals(testData.lastName, authors.lastName);
     }
 
-    @Story("Try to get Author by OutOfRangeID")
-    @Test
-    void getAuthorsByOutOfRangeId() throws IOException, InterruptedException {
-        int nonExistingId = 9999;
-        Response<ErrorModel> responseError = authors.getErrorByID(nonExistingId);
-        assertEquals(404, responseError.getStatusCode());
+    @DisplayName("Try to get Author by providing negative data")
+    @Story("Try to get Author by providing negative data")
+    @ParameterizedTest
+    @Step("Testing negative case with author ID: {testData.id}")
+    @MethodSource("testData.AuthorTestData#negativeGetData")
+    void getAuthorsByNegativeData(AuthorTestData.GetAuthorPositiveNegativeCase testData) throws IOException, InterruptedException {
+        Response<ErrorModel> responseError = authors.getErrorByID(testData.id);
+        assertEquals(testData.expectedStatus, responseError.getStatusCode());
 
         ErrorModel error = responseError.getBody();
 
-        assertEquals("Not Found", error.title);
+        assertEquals(testData.expectedTitle, error.title);
     }
 
-    @Story("Try to get Author by long ID")
-    @Test
-    void getAuthorsBylongId() throws IOException, InterruptedException {
-        int longId  = 2147483647;
-        Response<ErrorModel> responseError = authors.getErrorByID(longId);
-        assertEquals(404, responseError.getStatusCode());
-
-        ErrorModel error = responseError.getBody();
-
-        assertEquals("Not Found", error.title);
-    }
-
+    @DisplayName("Try to get Author by providing negative ID")
     @Story("Try to get Author by negative ID")
     @Test
     void getAuthorsByNegativeId() throws IOException, InterruptedException {
@@ -108,39 +106,17 @@ public class AuthorsTests {
         assertEquals("Not Found", error.title);
     }
 
-    @Story("Try to get Author by other negative ID")
-    @Test
-    void getAuthorsByOtherNegativeId() throws IOException, InterruptedException {
-        int otherNegaviteId  = -5;
-        Response<ErrorModel> responseError = authors.getErrorByID(otherNegaviteId);
-        assertEquals(404, responseError.getStatusCode());
-
-        ErrorModel error = responseError.getBody();
-
-        assertEquals("Not Found", error.title);
-    }
-
-    @Story("Try to get Author with 0 for ID")
-    @Test
-    void getAuthorsBy0Id() throws IOException, InterruptedException {
-        int zeroId  = 0;
-        Response<ErrorModel> responseError = authors.getErrorByID(zeroId);
-        assertEquals(404, responseError.getStatusCode());
-
-        ErrorModel error = responseError.getBody();
-
-        assertEquals("Not Found", error.title);
-    }
-
+    @DisplayName("Create Author with valid data")
     @Story("Create author")
-    @Test
-    void postAuthors() throws IOException, InterruptedException {
-        AuthorsModel createdAuthors = buildAuthors(322, 1010, "Joana", "Faber");
-        Response<AuthorsModel> response = authors.create(createdAuthors);
+    @ParameterizedTest
+    @Step("Testing author creation with author ID: {author.id}")
+    @MethodSource("testData.AuthorTestData#positivePostData")
+    void postAuthors(AuthorsModel author) throws IOException, InterruptedException {
+        Response<AuthorsModel> response = authors.create(author);
 
         assertEquals(200, response.getStatusCode());
 
-        AuthorsModel expected = createdAuthors;
+        AuthorsModel expected = author;
         AuthorsModel actual = response.getBody();
 
         assertEquals(expected.id, actual.id);
@@ -149,15 +125,17 @@ public class AuthorsTests {
         assertEquals(expected.lastName, actual.lastName);
     }
 
+    @DisplayName("Try to Create Author with invalid data")
     @Story("Try to create author with invalid data")
-    @Test
-    void postAuthorsInvalidData() throws IOException, InterruptedException {
-        AuthorsModel createdAuthors = buildAuthors(2147483647, 2147483647, "Too", "LargeID");
-        Response<AuthorsModel> response = authors.create(createdAuthors);
+    @ParameterizedTest
+    @Step("Testing author creation with invalid ID: {author.id}")
+    @MethodSource("testData.AuthorTestData#negativePostData")
+    void postAuthorsInvalidData(AuthorsModel author) throws IOException, InterruptedException {
+        Response<AuthorsModel> response = authors.create(author);
 
         assertEquals(200, response.getStatusCode());
 
-        AuthorsModel expected = createdAuthors;
+        AuthorsModel expected = author;
         AuthorsModel actual = response.getBody();
 
         assertEquals(expected.id, actual.id);
@@ -166,103 +144,17 @@ public class AuthorsTests {
         assertEquals(expected.lastName, actual.lastName);
     }
 
-    @Story("Try to create author with long name")
-    @Test
-    void postAuthorsLongName() throws IOException, InterruptedException {
-        AuthorsModel createdAuthors = buildAuthors(603,
-                60525,
-                "LongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongName",
-                "LongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastName");
-        Response<AuthorsModel> response = authors.create(createdAuthors);
-
-        assertEquals(200, response.getStatusCode());
-
-        AuthorsModel expected = createdAuthors;
-        AuthorsModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.idBook, actual.idBook);
-        assertEquals(expected.firstName, actual.firstName);
-        assertEquals(expected.lastName, actual.lastName);
-    }
-
-    @Story("Try to create author with empty names")
-    @Test
-    void postAuthorsEmptyNames() throws IOException, InterruptedException {
-        AuthorsModel createdAuthors = buildAuthors(608, 60526, "       ", "          ");
-        Response<AuthorsModel> response = authors.create(createdAuthors);
-
-        assertEquals(200, response.getStatusCode());
-
-        AuthorsModel expected = createdAuthors;
-        AuthorsModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.idBook, actual.idBook);
-        assertEquals(expected.firstName, actual.firstName);
-        assertEquals(expected.lastName, actual.lastName);
-    }
-
-    @Story("Try to create author with null for last name")
-    @Test
-    void postAuthorsNullLastName() throws IOException, InterruptedException {
-        AuthorsModel createdAuthors = buildAuthors(609, 60527, "Harry", null);
-        Response<AuthorsModel> response = authors.create(createdAuthors);
-
-        assertEquals(200, response.getStatusCode());
-
-        AuthorsModel expected = createdAuthors;
-        AuthorsModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.idBook, actual.idBook);
-        assertEquals(expected.firstName, actual.firstName);
-        assertEquals(expected.lastName, actual.lastName);
-    }
-
-    @Story("Try to create author with null for first name")
-    @Test
-    void postAuthorsNullFirstName() throws IOException, InterruptedException {
-        AuthorsModel createdAuthors = buildAuthors(615, 60529, null, "Johnson");
-        Response<AuthorsModel> response = authors.create(createdAuthors);
-
-        assertEquals(200, response.getStatusCode());
-
-        AuthorsModel expected = createdAuthors;
-        AuthorsModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.idBook, actual.idBook);
-        assertEquals(expected.firstName, actual.firstName);
-        assertEquals(expected.lastName, actual.lastName);
-    }
-
-    @Story("Try to create author with null for both names")
-    @Test
-    void postAuthorsNullBothNames() throws IOException, InterruptedException {
-        AuthorsModel createdAuthors = buildAuthors(616, 60530, null, null);
-        Response<AuthorsModel> response = authors.create(createdAuthors);
-
-        assertEquals(200, response.getStatusCode());
-
-        AuthorsModel expected = createdAuthors;
-        AuthorsModel actual = response.getBody();
-
-        assertEquals(expected.id, actual.id);
-        assertEquals(expected.idBook, actual.idBook);
-        assertEquals(expected.firstName, actual.firstName);
-        assertEquals(expected.lastName, actual.lastName);
-    }
-
+    @DisplayName("Update author and check response")
     @Story("Update author")
-    @Test
-    void updateAuthors() throws IOException, InterruptedException {
-        AuthorsModel updatedAuthors = buildAuthors(323, 1011, "First Name 511323", "Last Name 511323");
-        Response<AuthorsModel> response = authors.update(updatedAuthors);
+    @ParameterizedTest
+    @Step("Testing author update and check response with author ID: {author.id}")
+    @MethodSource("testData.AuthorTestData#positivePutData")
+    void updateAuthors(AuthorsModel author) throws IOException, InterruptedException {
+        Response<AuthorsModel> response = authors.update(author, author.id);
 
         assertEquals(200, response.getStatusCode());
 
-        AuthorsModel expected = updatedAuthors;
+        AuthorsModel expected = author;
         AuthorsModel actual = response.getBody();
 
         assertEquals(expected.id, actual.id);
@@ -271,47 +163,53 @@ public class AuthorsTests {
         assertEquals(expected.lastName, actual.lastName);
     }
 
+    @DisplayName("Get author, update and check update is made")
     @Story("Get and then update author")
-    @Test
-    void getUpdateAuthors() throws IOException, InterruptedException {
-        int idToGet = 200;
-        Response<AuthorsModel> response = authors.getAllByID(idToGet);
+    @ParameterizedTest
+    @Step("Testing get author, update and check update is made for author ID: {author.id}")
+    @MethodSource("testData.AuthorTestData#positivePutData")
+    void getUpdateAuthors(AuthorsModel author) throws IOException, InterruptedException {
+//        int idToGet = 200;
+        Response<AuthorsModel> response = authors.getByID(author.id);
         assertEquals(200, response.getStatusCode());
 
         AuthorsModel authorToCompare = response.getBody();
 
-        AuthorsModel updatedAuthors = buildAuthors(200, 66, "First Name 500200", "Last Name 500200");
-        Response<AuthorsModel> responseUpdate = authors.update(updatedAuthors);
+        Response<AuthorsModel> responseUpdated = authors.update(author, author.id);
 
-        assertEquals(200, responseUpdate.getStatusCode());
+        assertEquals(200, responseUpdated.getStatusCode());
 
-        AuthorsModel actual = responseUpdate.getBody();
+        AuthorsModel authorUpdated = responseUpdated.getBody();
 
-        assertEquals(authorToCompare.id, actual.id);
-        assertEquals(authorToCompare.idBook, actual.idBook);
-        assertEquals(authorToCompare.firstName, actual.firstName);
-        assertEquals(authorToCompare.lastName, actual.lastName);
+        assertEquals(authorUpdated.id, authorToCompare.id);
+        assertEquals(authorUpdated.idBook, authorToCompare.idBook);
+        assertEquals(authorUpdated.firstName, authorToCompare.firstName);
+        assertEquals(authorUpdated.lastName, authorToCompare.lastName);
     }
 
+    @DisplayName("Delete author with valid data")
     @Story("Delete author")
-    @Test
-    void deleteAuthor() throws IOException, InterruptedException {
-        int idToDelete = 201;
-        Response<AuthorsModel> response = authors.delete(idToDelete);
+    @ParameterizedTest
+    @Step("Testing delete author with ID: {testData.id}")
+    @MethodSource("testData.AuthorTestData#positiveDeleteData")
+    void deleteAuthor(AuthorTestData.GetAuthorPositiveNegativeCase testData) throws IOException, InterruptedException {
+        Response<AuthorsModel> response = authors.delete(testData.id);
         assertEquals(200, response.getStatusCode());
-        Response<AuthorsModel> responseGet = authors.getAllByID(idToDelete);
-        ;
-        assertEquals(404, responseGet.getStatusCode());
+        Response<AuthorsModel> responseGet = authors.getByID(testData.id);
+        assertEquals(testData.expectedStatus, responseGet.getStatusCode());
     }
 
+    @DisplayName("Try to delete author by providing invalid data")
     @Story("Try to delete author by providing invalid ID")
-    @Test
-    void invalidDelete() throws IOException, InterruptedException {
-        int idToDelete = -80;
-        Response<AuthorsModel> response = authors.delete(idToDelete);
-        assertEquals(404, response.getStatusCode());
+    @ParameterizedTest
+    @Step("Testing delete author with invalid ID: {testData.id}")
+    @MethodSource("testData.AuthorTestData#negativeDeleteData")
+    void invalidDelete(AuthorTestData.GetAuthorPositiveNegativeCase testData) throws IOException, InterruptedException {
+        Response<AuthorsModel> response = authors.delete(testData.id);
+        assertEquals(testData.expectedStatus, response.getStatusCode());
     }
 
+    @DisplayName("Try to create author with invalid ID")
     @Story("Try to create author with invalid ID")
     @Test
     void createInvalidPOSTAuthors() throws IOException, InterruptedException {

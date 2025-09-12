@@ -1,0 +1,100 @@
+[
+  {
+    "id": 123969,
+    "title": "My long id",
+    "description": "Long ID Descr",
+    "pageCount": 102,
+    "excerpt": "Long excerpt."
+  },
+  {
+    "id": 123,
+    "title": "My TEST Book",
+    "description": "How to create automation framework.",
+    "pageCount": 222,
+    "excerpt": "Sample excerpt..."
+  },
+  {
+    "id": 100,
+    "title": "My Book Long Title My Book Long Title My Book Long Title My Book Long Title My Book Long Title My Book Long Title My Book Long Title My Book Long Title",
+    "description": "Book with long title",
+    "pageCount": 530,
+    "excerpt": "Title"
+  },
+  {
+    "id": 133,
+    "title": "",
+    "description": "Book with empty title",
+    "pageCount": 510,
+    "excerpt": "Title empty"
+  },
+  {
+    "id": 138,
+    "title": "MyBookTitleNoDescription",
+    "description": "",
+    "pageCount": 514,
+    "excerpt": "Descr empty"
+  },
+  {
+    "id": 190,
+    "title": null,
+    "description": null,
+    "pageCount": 191,
+    "excerpt": "nullTitleDescr"
+  },
+  {
+    "id": 194,
+    "title": null,
+    "description": "NullForTitle",
+    "pageCount": 500,
+    "excerpt": "nullForTitle"
+  },
+  {
+    "id": 195,
+    "title": "NullForDescr",
+    "description": null,
+    "pageCount": 600,
+    "excerpt": "nullForDescr"
+  },
+  {
+    "id": 200,
+    "title": "Many Pages",
+    "description": "Many pages",
+    "pageCount": 30000000,
+    "excerpt": "bigPage"
+  },
+  {
+    "id": 301,
+    "title": "Invalid Pages",
+    "description": "Invalid pages decr",
+    "pageCount": -20,
+    "excerpt": "negativePage"
+  },
+  {
+    "id": 220,
+    "title": "Null Pages",
+    "description": "null pages count",
+    "pageCount": null,
+    "excerpt": "nullPage"
+  },
+  {
+    "id": 300,
+    "title": "Null excerpt",
+    "description": "null excerpt descr",
+    "pageCount": 600,
+    "excerpt": null
+  },
+  {
+    "id": 630,
+    "title": "Empty excerpt",
+    "description": "Empty excerpt descr",
+    "pageCount": 605,
+    "excerpt": ""
+  },
+  {
+    "id": 631,
+    "title": "Long excerpt",
+    "description": "Long excerpt descr",
+    "pageCount": 606,
+    "excerpt": "excerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerptexcerpt"
+  }
+]

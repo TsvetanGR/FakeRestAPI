@@ -1,0 +1,26 @@
+[
+  {
+    "id": 500,
+    "idBook": -9,
+    "firstName": "How to create invalid book",
+    "lastName": 550
+  },
+  {
+    "id": -400,
+    "idBook": 0,
+    "firstName": "How to create invalid book",
+    "lastName": ""
+  },
+  {
+    "id": 650,
+    "idBook": 0,
+    "firstName": "",
+    "lastName": ""
+  },
+  {
+    "id": 640,
+    "idBook": 680,
+    "firstName": "",
+    "lastName": "REET"
+  }
+]

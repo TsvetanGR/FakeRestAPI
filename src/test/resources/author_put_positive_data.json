@@ -1,0 +1,20 @@
+[
+  {
+    "id": 40,
+    "idBook": 800,
+    "firstName": "First Name 40 Updated",
+    "lastName": "Last Name 40 Updated"
+  },
+  {
+    "id": 100,
+    "idBook": 511,
+    "firstName": "empty Updated",
+    "lastName": "empty Updated"
+  },
+  {
+    "id": 190,
+    "idBook": 454,
+    "firstName": "First Name 190 Updated",
+    "lastName": "Last Name 190 Updated"
+  }
+]

@@ -19,13 +19,13 @@ public class BooksService {
     }
 
     @Step("Create Book")
-    public Response<BookModel> create(BookModel author) {
-        return rest.post("/api/v1/Books", author, BookModel.class);
+    public Response<BookModel> create(BookModel book) {
+        return rest.post("/api/v1/Books", book, BookModel.class);
     }
 
     @Step("Update Book")
-    public Response<BookModel> update(BookModel author) {
-        return rest.put("/api/v1/Books", 511, author, BookModel.class);
+    public Response<BookModel> update(BookModel book, int id) {
+        return rest.put("/api/v1/Books", id, book, BookModel.class);
     }
 
     @Step("Delete Book")
@@ -41,7 +41,7 @@ public class BooksService {
     }
 
     @Step("Get All Books by ID")
-    public Response<BookModel> getAllByID(int id) throws IOException, InterruptedException {
+    public Response<BookModel> getByID(int id) throws IOException, InterruptedException {
         return rest.getByID("/api/v1/Books", id, new TypeReference<BookModel>() {
         });
     }

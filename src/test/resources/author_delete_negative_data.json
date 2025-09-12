@@ -1,0 +1,14 @@
+[
+  {
+    "id": "-100",
+    "expectedStatus": 404
+  },
+  {
+    "id": "0",
+    "expectedStatus": 404
+  },
+  {
+    "id": "90000",
+    "expectedStatus": 404
+  }
+]

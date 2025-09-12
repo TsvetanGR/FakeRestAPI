@@ -1,0 +1,30 @@
+[
+  {
+    "id": 2147483647,
+    "title": "My Invalid Book",
+    "description": "How to create invalid book",
+    "pageCount": 550,
+    "excerpt": "Invalid"
+  },
+  {
+    "id": 2147483635,
+    "title": "",
+    "description": "How to create invalid book",
+    "pageCount": 550,
+    "excerpt": "Invalid"
+  },
+  {
+    "id": 2147483640,
+    "title": null,
+    "description": null,
+    "pageCount": 550,
+    "excerpt": "Invalid"
+  },
+  {
+    "id": 2147483611,
+    "title": "@#$%^&*(",
+    "description": "@#$%^&*()",
+    "pageCount": -90,
+    "excerpt": ")(*&^%^&*"
+  }
+]

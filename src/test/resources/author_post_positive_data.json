@@ -1,0 +1,74 @@
+[
+  {
+    "id": 322,
+    "idBook": 1010,
+    "firstName": "Joana",
+    "lastName": "Faber"
+  },
+  {
+    "id": 3226002,
+    "idBook": 1020,
+    "firstName": "LongId",
+    "lastName": "LastLongId"
+  },
+  {
+    "id": 603,
+    "idBook": 60525,
+    "firstName": "LongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongNameLongName",
+    "lastName": "LongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastNameLongLastName"
+  },
+  {
+    "id": 609,
+    "idBook": 61100,
+    "firstName": "",
+    "lastName": ""
+  },
+  {
+    "id": 906,
+    "idBook": 52200,
+    "firstName": "NullLastName",
+    "lastName": null
+  },
+  {
+    "id": 605,
+    "idBook": 53300,
+    "firstName": null,
+    "lastName": "NullFirstName"
+  },
+  {
+    "id": 800,
+    "idBook": 1052,
+    "firstName": null,
+    "lastName": null
+  },
+  {
+    "id": 146,
+    "idBook": 2147483647,
+    "firstName": "LongidBook",
+    "lastName": "LongidBookLast"
+  },
+  {
+    "id": 2147483647,
+    "idBook": 2147483647,
+    "firstName": "LongidBook",
+    "lastName": "LongidBookLast"
+  },
+  {
+    "id": 900,
+    "idBook": 20,
+    "firstName": "w",
+    "lastName": "r"
+  },
+  {
+    "id": 901,
+    "idBook": 1,
+    "firstName": "     ",
+    "lastName": "      "
+  },
+  {
+    "id": 0,
+    "idBook": 0,
+    "firstName": " H%N ",
+    "lastName": " #g# "
+  }
+]

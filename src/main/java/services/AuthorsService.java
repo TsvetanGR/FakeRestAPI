@@ -23,13 +23,13 @@ public class AuthorsService {
     }
 
     @Step("Update Author")
-    public Response<AuthorsModel> update(AuthorsModel author) {
-        return rest.put("/api/v1/Authors", 511, author, AuthorsModel.class);
+    public Response<AuthorsModel> update(AuthorsModel author, int id) {
+        return rest.put("/api/v1/Authors", id, author, AuthorsModel.class);
     }
 
     @Step("Delete Author")
     public Response<AuthorsModel> delete(int id) {
-        return rest.delete("/Authors", id, AuthorsModel.class);
+        return rest.delete("/api/v1/Authors", id, AuthorsModel.class);
     }
 
 
@@ -39,8 +39,8 @@ public class AuthorsService {
         });
     }
 
-    @Step("Get All authors by ID")
-    public Response<AuthorsModel> getAllByID(int id) throws IOException, InterruptedException {
+    @Step("Get author by ID")
+    public Response<AuthorsModel> getByID(int id) throws IOException, InterruptedException {
         return rest.getByID("/api/v1/Authors", id, new TypeReference<AuthorsModel>() {
         });
     }

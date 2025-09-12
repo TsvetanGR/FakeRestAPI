@@ -1,0 +1,22 @@
+[
+  {
+    "id": 9999,
+    "expectedStatus": 404,
+    "expectedTitle": "Not Found"
+  },
+  {
+    "id": 2147483647,
+    "expectedStatus": 404,
+    "expectedTitle": "Not Found"
+  },
+  {
+    "id": -50,
+    "expectedStatus": 404,
+    "expectedTitle": "Not Found"
+  },
+  {
+    "id": 0,
+    "expectedStatus": 404,
+    "expectedTitle": "Not Found"
+  }
+]

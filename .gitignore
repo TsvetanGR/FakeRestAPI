@@ -1,0 +1,10 @@
+# IntelliJ IDEA
+.idea/
+
+# Build output
+target/
+
+# Allure generated results & reports
+allure-results/
+allure-report/
+.allure/
